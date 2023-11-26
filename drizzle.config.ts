@@ -8,5 +8,5 @@ export default {
   dbCredentials: {
     connectionString: env.DATABASE_URL,
   },
-  tablesFilter: ["next-with-trpc-example_*"],
+  tablesFilter: ["nextjs-boilerplate_*"],
 } satisfies Config;

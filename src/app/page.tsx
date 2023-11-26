@@ -1,12 +1,13 @@
+"use client";
 import Link from "next/link";
-
 import { CreatePost } from "@/app/_components/create-post";
-import { getServerAuthSession } from "@/server/auth";
-import { api } from "@/trpc/server";
+import { useSession } from "next-auth/react";
+import { api } from "@/trpc/react";
 
-export default async function Home() {
-  const hello = await api.post.hello.query({ text: "from tRPC" });
-  const session = await getServerAuthSession();
+export default function Home() {
+  const { data: hello } = api.post.hello.useQuery({ text: "Hello from TRPC" });
+  const { data: session } = useSession();
+  const { data, isLoading } = api.post.sayHi.useQuery();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
@@ -14,6 +15,7 @@ export default async function Home() {
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
           Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
         </h1>
+        <h5>{isLoading ? "Loading" : data}</h5>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
           <Link
             className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
@@ -62,11 +64,10 @@ export default async function Home() {
   );
 }
 
-async function CrudShowcase() {
-  const session = await getServerAuthSession();
+function CrudShowcase() {
+  const { data: session } = useSession();
   if (!session?.user) return null;
-
-  const latestPost = await api.post.getLatest.query();
+  const { data: latestPost } = api.post.getLatest.useQuery();
 
   return (
     <div className="w-full max-w-xs">
